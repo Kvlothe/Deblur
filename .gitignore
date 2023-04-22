@@ -2,3 +2,5 @@ Gopro/
 RealBlur/
 98.png
 deblurred_img.jpg
+.idea/
+__pycache__/
