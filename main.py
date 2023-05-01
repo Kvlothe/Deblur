@@ -6,6 +6,15 @@ import numpy as np
 from PIL import Image
 import cv2
 
+
+class ClipLayer(keras.layers.Layer):
+    def __init__(self, **kwargs):
+        super(ClipLayer, self).__init__(**kwargs)
+
+    def call(self, inputs):
+        return tf.clip_by_value(inputs, 0.0, 1.0)
+
+
 # Define the U-Net model
 inputs = keras.layers.Input(shape=(None, None, 3))
 conv1 = keras.layers.Conv2D(32, 3, activation='relu', padding='same')(inputs)
