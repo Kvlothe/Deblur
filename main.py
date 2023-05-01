@@ -60,21 +60,32 @@ model.compile(optimizer='adam', loss='mean_squared_error')
 
 ########################################
 # Define the path to your blurry and clear test image datasets
-blurry_test_images_path = 'Gopro/test/blur'
-clear_test_images_path = 'Gopro/test/sharp'
-# Define the path to your blurry and clear image datasets
-blurry_images_path = 'Gopro/train/blur'
-clear_images_path = 'Gopro/train/sharp'
+# blurry_test_images_path = 'Gopro/Test/Blur'
+# clear_test_images_path = 'Gopro/Test/Sharp'
+blurry_test_images_path = 'C:/Users/komun/Downloads/archive/DBlur/Wider-Face/test/blur'
+clear_test_images_path = 'C:/Users/komun/Downloads/archive/DBlur/Wider-Face/test/sharp'
+# Define the path to your blurry and clear Train image datasets
+# blurry_train_images_path = 'Gopro/Train/Blur'
+# clear_train_images_path = 'Gopro/Train/Sharp'
+# blurry_train_images_path = 'TextOCR/Train/Blur'
+# clear_train_images_path = 'TextOCR/Train/Sharp'
+blurry_train_images_path = 'C:/Users/komun/Downloads/archive/DBlur/Wider-Face/train/blur'
+clear_train_images_path = 'C:/Users/komun/Downloads/archive/DBlur/Wider-Face/train/sharp'
 
 # Define the size of your input and output images
 image_size = (256, 256)
+# image_size = (1280, 720)
 
 # Load the blurry test images into a NumPy array
 X_test = []
 for filename in os.listdir(blurry_test_images_path):
+    # Open image
     img = Image.open(os.path.join(blurry_test_images_path, filename))
+    # Resize image
     img = img.resize(image_size)
+    # Turn image into a np array
     img = np.array(img)
+    # append image to test array
     X_test.append(img)
 X_test = np.array(X_test)
 
@@ -88,19 +99,11 @@ for filename in os.listdir(clear_test_images_path):
 y_test = np.array(y_test)
 ###################################
 
-# Load the blurry test images into a NumPy array
-X_test = []
-for filename in os.listdir(blurry_test_images_path):
-    img = Image.open(os.path.join(blurry_test_images_path, filename))
-    img = img.resize(image_size)
-    img = np.array(img)
-    X_test.append(img)
-X_test = np.array(X_test)
 ###########################################
 # Load the blurry images into a NumPy array
 x_train = []
-for filename in os.listdir(blurry_images_path):
-    img = Image.open(os.path.join(blurry_images_path, filename))
+for filename in os.listdir(blurry_train_images_path):
+    img = Image.open(os.path.join(blurry_train_images_path, filename))
     img = img.resize(image_size)
     img = np.array(img)
     x_train.append(img)
@@ -108,42 +111,48 @@ x_train = np.array(x_train)
 
 # Load the clear images into a NumPy array
 y_train = []
-for filename in os.listdir(clear_images_path):
-    img = Image.open(os.path.join(clear_images_path, filename))
+for filename in os.listdir(clear_train_images_path):
+    img = Image.open(os.path.join(clear_train_images_path, filename))
     img = img.resize(image_size)
     img = np.array(img)
     y_train.append(img)
 y_train = np.array(y_train)
 ##########################################
-# Load the blurry images into a NumPy array
-x_train = []
-for filename in os.listdir(blurry_images_path):
-    img = Image.open(os.path.join(blurry_images_path, filename))
-    img = img.resize(image_size)
-    img = np.array(img)
-    x_train.append(img)
-x_train = np.array(x_train)
-FIT = model.fit(x_train, y_train, validation_data=(X_test, y_test), epochs=10)
 
-score = model.evaluate(X_test, y_test, verbose=0)
-print('Test loss:', score)
+# FIT = model.fit(x_train, y_train, validation_data=(X_test, y_test), epochs=10)
+#
+# score = model.evaluate(X_test, y_test, verbose=0)
+# print('Test loss:', score)
 
-print('Training session complete')
 
 # Load a blurry image
-img = cv2.imread('98.jpg')
+# img = Image.open('98.png')
+img = Image.open('980.png')
+# img = Image.open('7.jpg')
 
 # Resize the image to the desired input size
-img = cv2.resize(img, image_size)
-
-# Add a batch dimension to the image
-img = np.expand_dims(img, axis=0)
+img = img.resize(image_size)
 
 # Use the trained model to deblur the image
-deblurred_img = model.predict(img)
+deblurred_img = model.predict(np.expand_dims(np.array(img), axis=0))
 
 # Remove the batch dimension from the deblurred image
 deblurred_img = np.squeeze(deblurred_img, axis=0)
+
+# Convert the deblurred image from floating point values to unsigned 8-bit integers
+deblurred_img = np.clip(deblurred_img * 255, 0, 255).astype('uint8')
+
+# Create a new Pillow image from the deblurred image
+deblurred_img_pil = Image.fromarray(deblurred_img)
+
+# Convert from BGR to RGB
+deblurred_img = cv2.cvtColor(deblurred_img, cv2.COLOR_BGR2RGB)
+
+# Save the deblurred image
+Image.fromarray(deblurred_img).save('deblurred.png')
+
+# # Save the deblurred image to a file
+# deblurred_img_pil.save('deblurred1.png')
 
 # Display the deblurred image
 plt.imshow(deblurred_img)
