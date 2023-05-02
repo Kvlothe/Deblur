@@ -86,16 +86,16 @@ model.compile(optimizer='adam', loss='mean_squared_error')
 
 ########################################
 # Define the path to your blurry and clear test image datasets
-blurry_test_images_path = 'Test/Blur'
-clear_test_images_path = 'Test/Sharp'
-# blurry_test_images_path = 'C:/Users/komun/Downloads/archive/DBlur/Helen/test/blur'
-# clear_test_images_path = 'C:/Users/komun/Downloads/archive/DBlur/Helen/test/sharp'
+# blurry_test_images_path = 'Test/Blur'
+# clear_test_images_path = 'Test/Sharp'
+blurry_test_images_path = 'C:/Users/komun/Downloads/archive/DBlur/Helen/test/blur'
+clear_test_images_path = 'C:/Users/komun/Downloads/archive/DBlur/Helen/test/sharp'
 
 # Define the path to your blurry and clear Train image datasets
-blurry_train_images_path = 'Train/Blur'
-clear_train_images_path = 'Train/Sharp'
-# blurry_train_images_path = 'C:/Users/komun/Downloads/archive/DBlur/Helen/train/blur'
-# clear_train_images_path = 'C:/Users/komun/Downloads/archive/DBlur/Helen/train/sharp'
+# blurry_train_images_path = 'Train/Blur'
+# clear_train_images_path = 'Train/Sharp'
+blurry_train_images_path = 'C:/Users/komun/Downloads/archive/DBlur/Helen/train/blur'
+clear_train_images_path = 'C:/Users/komun/Downloads/archive/DBlur/Helen/train/sharp'
 
 # Define the size of your input and output images
 image_size = (256, 256)
