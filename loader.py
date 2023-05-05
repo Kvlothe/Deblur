@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 
 # Define the size of your input images
-# image_size = (256, 256)
+image_size = (512, 512)
 
 
 # Resize image by a ratio - to account for memory issues and dataset mismatch of size
@@ -29,7 +29,7 @@ def load_images(image_path):
     ratio = 0.5
     for filename in os.listdir(image_path):
         img = Image.open(os.path.join(image_path, filename))
-        image_size = resize_image_by_ratio(img, ratio)
+        # img = resize_image_by_ratio(img, ratio)
         img = img.resize(image_size)
         img = np.array(img) / 255
         image_array.append(img)
