@@ -1,14 +1,14 @@
 from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
 import os
-from loader import for_train
-from loader import for_test
+from loader import load_images
 from unet import UNet
 import numpy as np
 from PIL import Image
 import cv2
-
+from unet import StepDecay
 
 image_size = (256, 256)
 
@@ -22,43 +22,56 @@ def main():
     else:
         # If the model file doesn't exist, create a new UNet model
         model = UNet(input_shape=(None, None, 3))
-        model.compile(optimizer='adam', loss='mean_squared_error')
+
+        # Set custom learning rate
+        learning_rate = 0.0001
+        optimizer = Adam(learning_rate=learning_rate)
+
+        # Compile the model using the custom optimizer
+        model.compile(optimizer=optimizer, loss='mean_squared_error')
+        # model.compile(optimizer='adam', loss='mean_squared_error')
 
     # Load your new training data
-    # x_load = 'Train/Blur'
-    # y_load = 'Train/Sharp'
-    x_load = 'C:/Users/komun/Downloads/archive/DBlur/Helen/train/blur'
-    y_load = 'C:/Users/komun/Downloads/archive/DBlur/Helen/train/sharp'
-    x_trainer = for_train(x_load)
-    y_trainer = for_train(y_load)
-    # x_test = 'Test/Blur'
-    # y_test = 'Test/Sharp'
-    x_test = 'C:/Users/komun/Downloads/archive/DBlur/Helen/test/blur'
-    y_test = 'C:/Users/komun/Downloads/archive/DBlur/Helen/test/sharp'
-    x_tester = for_test(x_test)
-    y_tester = for_test(y_test)
+    x_load = 'Gopro/train/Blur'
+    y_load = 'Gopro/train/Sharp'
+    # x_load = 'C:/Users/komun/Downloads/archive/DBlur/Wider-Face/train/blur'
+    # y_load = 'C:/Users/komun/Downloads/archive/DBlur/Wider-Face/train/sharp'
+    x_test = 'Gopro/test/Blur'
+    y_test = 'Gopro/test/Sharp'
+    # x_test = 'C:/Users/komun/Downloads/archive/DBlur/Wider-Face/test/blur'
+    # y_test = 'C:/Users/komun/Downloads/archive/DBlur/Wider-Face/test/sharp'
+
+    x_train_images = load_images(x_load)
+    y_train_images = load_images(y_load)
+    x_test_images = load_images(x_test)
+    y_test_images = load_images(y_test)
 
     # Adding a way to stop the training early if the value loss does not decrease
+    # Change stop rate, over fitting and under fitting **EDIT TO FINE TUNE**
     early_stopping = EarlyStopping(monitor='val_loss',
-                                   patience=10,
+                                   patience=5,
                                    verbose=1,
                                    restore_best_weights=True)
 
+    # Instantiate the step decay callback with the desired parameters
+    # Change learning rate, **EDIT TO FINE TUNE**
+    step_decay_callback = StepDecay(initial_lr=learning_rate, decay_factor=0.5, step_size=10)
+
     # Train the model on new data
-    history = model.fit(x_trainer, y_trainer,
-                        validation_data=(x_tester, y_tester),
-                        epochs=25,
-                        batch_size=32,
-                        callbacks=[early_stopping])
+    history = model.fit(x_train_images, y_train_images,
+                        validation_data=(x_test_images, y_test_images),
+                        epochs=50,
+                        batch_size=64,
+                        callbacks=[early_stopping, step_decay_callback])
 
     # Save the updated model
     model.save(model_file)
 
     # Load a blurry image
-    img = Image.open('1.jpg')
-
+    img = Image.open('3.jpg')
+    # original_size = img.shape
     # Resize the image to the desired input size
-    img = img.resize(image_size)
+    # img = img.resize(image_size)
 
     # Convert the image to a numpy array and normalize
     img_np = np.array(img) / 255.0
@@ -79,6 +92,7 @@ def main():
     # Convert from BGR to RGB
     deblurred_img = cv2.cvtColor(deblurred_img, cv2.COLOR_BGR2RGB)
 
+    # img = img.resize(original_size)
     # Save the deblurred image
     Image.fromarray(deblurred_img).save('deblurred.png')
 
