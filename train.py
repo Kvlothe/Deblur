@@ -1,5 +1,6 @@
 from loader import load_images
 from tensorflow.keras.callbacks import EarlyStopping
+from keras.preprocessing.image import ImageDataGenerator
 from unet import StepDecay
 
 
@@ -19,6 +20,21 @@ def train(model, model_file):
     blur_test_images = load_images(test_blur)
     sharp_test_images = load_images(test_sharp)
 
+    # Data augmentation
+    datagen = ImageDataGenerator(
+        rotation_range=20,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True,
+        fill_mode='nearest'
+    )
+
+    batch_size = 8
+    # Use the generator to create an iterator for your dataset
+    train_iterator = datagen.flow(blur_train_images, sharp_train_images, batch_size=batch_size)
+
     # Instantiate the early stopping callback with desired parameters
     # Change stop rate, over fitting and under fitting **EDIT TO FINE TUNE**
     early_stopping = EarlyStopping(monitor='val_loss',
@@ -34,9 +50,9 @@ def train(model, model_file):
                                     step_size=10)
 
     # Train the model on new data
-    history = model.fit(blur_train_images, sharp_train_images,
+    history = model.fit(train_iterator,
                         validation_data=(blur_test_images, sharp_test_images),
-                        epochs=5,
+                        epochs=10,
                         batch_size=16,
                         callbacks=[early_stopping, step_decay_callback])
 

@@ -5,9 +5,6 @@ from train import train
 from dblur import dblur
 from unet import UNet
 
-image_size = (1024, 1024)
-learning_rate = 0.0001
-
 
 def main():
     model_file = "dblur.h5"
@@ -20,12 +17,11 @@ def main():
         model = UNet(input_shape=(None, None, 3))
 
         # Set custom learning rate
-
+        learning_rate = 0.0001
         optimizer = Adam(learning_rate=learning_rate)
 
         # Compile the model using the custom optimizer
         model.compile(optimizer=optimizer, loss='mean_squared_error')
-        # model.compile(optimizer='adam', loss='mean_squared_error')
 
     train(model, model_file)
     dblur(model)

@@ -2,13 +2,17 @@ import numpy as np
 from PIL import Image
 import cv2
 import matplotlib.pyplot as plt
+from loader import pad_image_to_square
 
 
 def dblur(model):
-    image_size = (1024, 1024)
+    ratio = 0.5
+    image_size = (1280, 1024)
     # Load a blurry image
     img = Image.open('3.jpg')
-    # original_size = img.shape
+    # image_size = resize_image_by_ratio(img, ratio)
+    img = pad_image_to_square(img, fill_value=0)
+
     # Resize the image to the desired input size
     img = img.resize(image_size)
 
@@ -31,7 +35,6 @@ def dblur(model):
     # Convert from BGR to RGB
     deblurred_img = cv2.cvtColor(deblurred_img, cv2.COLOR_BGR2RGB)
 
-    # img = img.resize(original_size)
     # Save the deblurred image
     Image.fromarray(deblurred_img).save('deblurred.png')
 

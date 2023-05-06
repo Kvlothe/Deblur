@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, UpSampling2D, BatchNor
 from tensorflow.keras.callbacks import Callback
 
 
-# Custom class for layer clipping
+# Class for layer clipping
 class ClipLayer(keras.layers.Layer):
     def __init__(self, **kwargs):
         super(ClipLayer, self).__init__(**kwargs)
@@ -14,6 +14,7 @@ class ClipLayer(keras.layers.Layer):
         return tf.clip_by_value(inputs, 0.0, 1.0)
 
 
+# Class Step Decay for fine-tuning
 class StepDecay(Callback):
     def __init__(self, initial_lr, decay_factor, step_size):
         super(StepDecay, self).__init__()
