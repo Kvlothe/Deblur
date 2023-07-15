@@ -66,3 +66,4 @@ def load_images(image_path):
         image_array.append(img)
     image_array = np.array(image_array)
     return image_array
+

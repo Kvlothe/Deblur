@@ -1,9 +1,10 @@
 from tensorflow.keras.models import load_model
-from tensorflow.keras.optimizers import Adam
 import os
 from train import train
 from dblur import dblur
 from unet import UNet
+from unet import psnr
+from unet import ClipLayer
 
 
 def main():
@@ -11,17 +12,11 @@ def main():
 
     # Check if the model file exists, if yes, load the model
     if os.path.exists(model_file):
-        model = load_model(model_file)
+        model = load_model(model_file, custom_objects={'psnr': psnr, 'ClipLayer': ClipLayer})
     else:
-        # If the model file doesn't exist, create a new UNet model
-        model = UNet(input_shape=(None, None, 3))
-
-        # Set custom learning rate
-        learning_rate = 0.0001
-        optimizer = Adam(learning_rate=learning_rate)
-
-        # Compile the model using the custom optimizer
-        model.compile(optimizer=optimizer, loss='mean_squared_error')
+        # If the model file doesn't exist, create a new UNet model with the custom learning rate
+        learning_rate = 0.001
+        model = UNet(input_shape=(None, None, 3), learning_rate=learning_rate)
 
     train(model, model_file)
     dblur(model)

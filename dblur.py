@@ -6,10 +6,15 @@ from loader import pad_image_to_square
 
 
 def dblur(model):
-    ratio = 0.5
-    image_size = (1280, 1024)
     # Load a blurry image
-    img = Image.open('3.jpg')
+    img = Image.open('1.jpg')
+    # img = Image.open('3.jpg')
+    # img = Image.open('7.jpg')
+    # img = Image.open('98.png')
+    # img = Image.open('980.png')
+
+    ratio = 0.5
+    image_size = (512, 512)
     # image_size = resize_image_by_ratio(img, ratio)
     img = pad_image_to_square(img, fill_value=0)
 

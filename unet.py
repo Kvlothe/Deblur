@@ -27,11 +27,16 @@ class StepDecay(Callback):
         self.model.optimizer.lr.assign(new_lr)
 
 
+def psnr(y_true, y_pred):
+    return tf.image.psnr(y_true, y_pred, max_val=1.0)
+
+
 # U-Net class
 class UNet(tf.keras.models.Model, ABC):
-    def __init__(self, input_shape=(None, None, 3)):
+    def __init__(self, input_shape=(None, None, 3), optimizer='adam', learning_rate=0.0001, loss='mean_squared_error'):
         super(UNet, self).__init__()
 
+        self.compile(optimizer=optimizer, learning_rate=learning_rate, loss=loss)
         inputs = Input(shape=input_shape)
 
         # Define the U-Net model
@@ -103,3 +108,7 @@ class UNet(tf.keras.models.Model, ABC):
 
     def compile(self, optimizer='adam', loss='mean_squared_error', **kwargs):
         super(UNet, self).compile(optimizer=optimizer, loss=loss, **kwargs)
+
+    # def compile(self, optimizer='adam', loss='mean_squared_error', **kwargs):
+    #     super(UNet, self).compile(optimizer=optimizer, loss=loss, metrics=[tf.keras.metrics.MeanAbsoluteError(), psnr],
+    #                               **kwargs)
